@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Association Game</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap');
+  </style>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="app">
+    <h1>WORD ASSOCIATION</h1>
+    
+    <div class="controls">
+      <select id="gamemode-select">
+        <option value="1">1. Character & Situation</option>
+        <option value="2">2. Adjective & Character</option>
+        <option value="3">3. Random Word</option>
+        <option value="4">4. Random Topic</option>
+        <option value="5">5. Two Random Topics</option>
+        <option value="6">6. Word Stream (History)</option>
+        <option value="7">7. Saying & Topic</option>
+      </select>
+    </div>
+
+    <div id="game-display" class="game-display">
+      <!-- Content will be injected here -->
+    </div>
+    
+    <div class="instruction">Press SPACEBAR to generate</div>
+  </div>
+
+  <!-- Load Data Files -->
+  <script src="data/characters.js"></script>
+  <script src="data/situations.js"></script>
+  <script src="data/sayings.js"></script>
+  <script src="data/adjectives.js"></script>
+  <script src="data/topics.js"></script>
+  <script src="data/all-words.js"></script>
+  
+  <!-- Main Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
