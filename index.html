@@ -25,6 +25,10 @@
                 <li data-mode="6">6. Word Stream -> Story</li>
                 <li data-mode="7">7. Saying & Topic</li>
             </ul>
+
+            <div class="sidebar-footer">
+                <button id="export-btn" class="export-btn">⬇ Export Flags</button>
+            </div>
         </aside>
 
         <main class="main-content">
@@ -39,8 +43,16 @@
             </div>
 
             <div class="instruction">Press SPACEBAR to generate</div>
+
+            <!-- Flag Button -->
+            <button id="flag-btn" class="flag-btn" title="Flag this result">
+                🚩 <span id="flag-count">0</span>
+            </button>
         </main>
     </div>
+
+    <!-- Export Modal/Button (Hidden by default, or just in sidebar?) -->
+    <!-- Let's put Export in Sidebar for better UX -->
 
     <!-- Load Data Files -->
     <script src="data/characters.js"></script>

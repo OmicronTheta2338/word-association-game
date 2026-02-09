@@ -45,6 +45,7 @@ function generateContent() {
 // Render Helpers
 function renderSingleLine(text) {
     wordHistory = []; // Reset history if switching away from Mode 6
+    currentContent = { type: 'single', text: text }; // Capture content
     const el = document.createElement('div');
     el.className = 'word-row';
     el.textContent = text;
@@ -53,6 +54,7 @@ function renderSingleLine(text) {
 
 function renderTwoLines(text1, text2) {
     wordHistory = [];
+    currentContent = { type: 'double', text1: text1, text2: text2 }; // Capture content
     const el1 = document.createElement('div');
     el1.className = 'word-row';
     el1.textContent = text1;
@@ -71,6 +73,7 @@ function updateHistory() {
     const newWord = getRandom(ALL_WORDS);
     wordHistory.unshift(newWord); // Add to beginning
     if (wordHistory.length > 5) wordHistory.pop(); // Keep max 5
+    currentContent = { type: 'stream', history: [...wordHistory] }; // Capture snapshot
 }
 
 function renderHistory() {
@@ -144,6 +147,94 @@ document.addEventListener('keyup', (e) => {
         generateContent();
     }
 });
+
+// Flagging System
+let currentContent = null; // Store current generated content
+let flaggedItems = [];
+// Removed: let flaggedItems = JSON.parse(localStorage.getItem('flaggedItems') || '[]');
+
+const flagBtn = document.getElementById('flag-btn');
+const flagCountSpan = document.getElementById('flag-count');
+const exportBtn = document.getElementById('export-btn');
+
+function updateFlagCount() {
+    flagCountSpan.textContent = flaggedItems.length;
+}
+
+// Fetch flags from server on load
+async function loadFlags() {
+    try {
+        const res = await fetch('/api/flags');
+        if (res.ok) {
+            flaggedItems = await res.json();
+            updateFlagCount();
+        }
+    } catch (e) {
+        console.error("Failed to load flags from server", e);
+        // Optional: Fallback to localStorage if server fails?
+        // For now, we assume server is primary as requested.
+    }
+}
+
+// Initialize count
+loadFlags();
+
+flagBtn.addEventListener('click', async () => {
+    if (!currentContent) return;
+
+    // Check if already locally known to be flagged (optimistic check)
+    const exists = flaggedItems.some(item => JSON.stringify(item.content) === JSON.stringify(currentContent));
+
+    if (!exists) {
+        const newFlag = {
+            timestamp: new Date().toISOString(),
+            mode: currentMode,
+            content: currentContent
+        };
+
+        // Optimistic UI update
+        flaggedItems.push(newFlag);
+        updateFlagCount();
+        flagBtn.classList.add('flagged');
+        setTimeout(() => flagBtn.classList.remove('flagged'), 500);
+
+        try {
+            const res = await fetch('/api/flags', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newFlag)
+            });
+
+            if (!res.ok) {
+                console.error("Failed to save flag to server");
+                // Revert optimistic update?
+                // flaggedItems.pop(); updateFlagCount();
+            } else {
+                // Server might return updated list or count, but we are good.
+            }
+        } catch (e) {
+            console.error("Error saving flag", e);
+        }
+    }
+});
+
+exportBtn.addEventListener('click', () => {
+    if (flaggedItems.length === 0) {
+        alert("No flagged items to export.");
+        return;
+    }
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(flaggedItems, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "word_game_flags.json");
+    document.body.appendChild(downloadAnchorNode); // Required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+});
+
+// Update generateContent to store current state
+// We need to modify the render functions to update `currentContent`
 
 // Initial Render
 // Optionally start empty or generate once

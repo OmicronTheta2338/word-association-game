@@ -185,6 +185,78 @@ body {
   color: #666;
 }
 
+/* Flag Button */
+.flag-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid #333;
+  padding: 1rem 1.5rem;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.flag-btn:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.flag-btn:active {
+  transform: translateY(0);
+}
+
+.flag-btn.flagged {
+  background-color: rgba(255, 0, 0, 0.2);
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+/* Sidebar Footer & Export */
+.sidebar {
+  /* Existing styles... ensure flex column is set */
+  justify-content: space-between;
+  /* Push footer to bottom */
+}
+
+/* Fix gamemode list to take available space */
+#gamemode-list {
+  flex-grow: 1;
+}
+
+.sidebar-footer {
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+  margin-top: 1rem;
+}
+
+.export-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #2c2c2c;
+  color: #888;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+}
+
+.export-btn:hover {
+  background-color: #383838;
+  color: var(--text-color);
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
   h1 {
@@ -201,5 +273,12 @@ body {
 
   .controls {
     flex-direction: column;
+  }
+
+  .flag-btn {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
   }
 }
