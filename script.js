@@ -99,6 +99,22 @@ function renderHistory() {
 
 // Event Listeners
 // Handle Sidebar Clicks
+// Instructions Data
+const INSTRUCTIONS = {
+    "1": { title: "CHARACTER & SITUATION", desc: "Act out the character in this situation." },
+    "2": { title: "ADJECTIVE & CHARACTER", desc: "Roleplay this character with this specific trait." },
+    "3": { title: "WORD -> CONTEXTS", desc: "List as many contexts/associations for this word as possible." },
+    "4": { title: "TOPIC -> SYNONYMS", desc: "Give synonyms or examples related to this topic." },
+    "5": { title: "TOPIC CONNECTION", desc: "Find two elements that rhyme, two elements that alliterate, and a context/word that could fit either." },
+    "6": { title: "WORD STREAM STORY", desc: "Incorporate the new word into a continuous story." },
+    "7": { title: "SAYING & TOPIC", desc: "Use this saying in a conversation about the topic." }
+};
+
+// DOM Elements
+const instructionsContainer = document.getElementById('mode-instructions');
+
+// Event Listeners
+// Handle Sidebar Clicks
 const sidebarList = document.getElementById('gamemode-list');
 const listItems = sidebarList.querySelectorAll('li');
 
@@ -111,11 +127,15 @@ listItems.forEach(item => {
         // Update Mode
         currentMode = item.dataset.mode;
         wordHistory = []; // Reset history on mode change
-        display.innerHTML = ''; // Clear display
 
-        // Optional: Auto-generate on switch? Or wait for Spacebar?
-        // User didn't specify, but waiting for spacebar is safer to avoid confusion.
-        // display.innerHTML = '<div class="instruction" style="position:static; opacity:0.5;">Press Spacebar</div>';
+        // Update Instructions
+        const data = INSTRUCTIONS[currentMode];
+        if (data) {
+            instructionsContainer.innerHTML = `<h1>${data.title}</h1><p>${data.desc}</p>`;
+        }
+
+        // Auto-Generate Content
+        generateContent();
     });
 });
 

@@ -79,19 +79,43 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Generally center content */
   position: relative;
   padding: 2rem;
+  /* Prevent content from pushing sidebar */
+  min-width: 0;
+  overflow-y: auto;
+  /* Allow scrolling if content gets too tall */
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
+/* Dynamic Instructions Styling */
+.mode-instructions {
+  position: absolute;
+  top: 2rem;
+  text-align: center;
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.mode-instructions h1 {
+  font-size: 2rem;
+  /* Slightly smaller to fit better */
+  margin-bottom: 0.5rem;
   font-weight: 300;
   letter-spacing: 2px;
   color: var(--secondary-color);
-  position: absolute;
-  top: 2rem;
+  position: static;
+  /* Remove absolute from H1 itself */
+}
+
+.mode-instructions p {
+  color: #888;
+  font-size: 1rem;
+  margin: 0;
+  max-width: 600px;
+  /* Readability */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Game Display */
