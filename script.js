@@ -98,10 +98,25 @@ function renderHistory() {
 }
 
 // Event Listeners
-select.addEventListener('change', (e) => {
-    currentMode = e.target.value;
-    wordHistory = []; // Reset history on mode change
-    display.innerHTML = '<div class="instruction" style="position:static; margin-top:20px;">Press Spacebar</div>';
+// Handle Sidebar Clicks
+const sidebarList = document.getElementById('gamemode-list');
+const listItems = sidebarList.querySelectorAll('li');
+
+listItems.forEach(item => {
+    item.addEventListener('click', () => {
+        // Update Active State
+        listItems.forEach(li => li.classList.remove('active'));
+        item.classList.add('active');
+
+        // Update Mode
+        currentMode = item.dataset.mode;
+        wordHistory = []; // Reset history on mode change
+        display.innerHTML = ''; // Clear display
+
+        // Optional: Auto-generate on switch? Or wait for Spacebar?
+        // User didn't specify, but waiting for spacebar is safer to avoid confusion.
+        // display.innerHTML = '<div class="instruction" style="position:static; opacity:0.5;">Press Spacebar</div>';
+    });
 });
 
 document.addEventListener('keyup', (e) => {
