@@ -1,6 +1,7 @@
 // Game State
 let currentMode = "1";
 let wordHistory = []; // For Mode 6
+let generationHistory = []; // Stack for Undo functionality
 
 // DOM Elements
 const display = document.getElementById('game-display');
@@ -14,6 +15,15 @@ function getRandom(arr) {
 
 // Logic for each Gamemode
 function generateContent() {
+    // Snapshot current state for Undo
+    if (currentContent) {
+        generationHistory.push({
+            mode: currentContent.mode || currentMode, // Fallback to currentMode if not in content (shouldn't happen with new logic)
+            content: JSON.parse(JSON.stringify(currentContent)) // Deep copy to avoid reference issues
+        });
+        if (generationHistory.length > 50) generationHistory.shift(); // Limit history size
+    }
+
     display.innerHTML = ''; // Clear current content
 
     switch (currentMode) {
@@ -45,7 +55,7 @@ function generateContent() {
 // Render Helpers
 function renderSingleLine(text) {
     wordHistory = []; // Reset history if switching away from Mode 6
-    currentContent = { type: 'single', text: text }; // Capture content
+    currentContent = { type: 'single', text: text, mode: currentMode }; // Capture content with mode
     const el = document.createElement('div');
     el.className = 'word-row';
     el.textContent = text;
@@ -54,7 +64,7 @@ function renderSingleLine(text) {
 
 function renderTwoLines(text1, text2) {
     wordHistory = [];
-    currentContent = { type: 'double', text1: text1, text2: text2 }; // Capture content
+    currentContent = { type: 'double', text1: text1, text2: text2, mode: currentMode }; // Capture content with mode
     const el1 = document.createElement('div');
     el1.className = 'word-row';
     el1.textContent = text1;
@@ -73,7 +83,7 @@ function updateHistory() {
     const newWord = getRandom(ALL_WORDS);
     wordHistory.unshift(newWord); // Add to beginning
     if (wordHistory.length > 5) wordHistory.pop(); // Keep max 5
-    currentContent = { type: 'stream', history: [...wordHistory] }; // Capture snapshot
+    currentContent = { type: 'stream', history: [...wordHistory], mode: currentMode }; // Capture snapshot with mode
 }
 
 function renderHistory() {
@@ -142,11 +152,69 @@ listItems.forEach(item => {
     });
 });
 
+
+
 document.addEventListener('keyup', (e) => {
     if (e.code === 'Space') {
         generateContent();
     }
 });
+
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        undoGeneration();
+    }
+});
+
+function undoGeneration() {
+    if (generationHistory.length === 0) return;
+
+    const previousState = generationHistory.pop();
+    currentMode = previousState.mode;
+    currentContent = previousState.content;
+
+    // Restore UI state for mode
+    // Update Sidebar Active Class
+    listItems.forEach(li => {
+        if (li.dataset.mode === currentMode) li.classList.add('active');
+        else li.classList.remove('active');
+    });
+
+    // Update Instructions
+    const data = INSTRUCTIONS[currentMode];
+    if (data) {
+        instructionsContainer.innerHTML = `<h1>${data.title}</h1><p>${data.desc}</p>`;
+    }
+
+    // Restore Content
+    display.innerHTML = '';
+
+    if (currentContent.type === 'single') {
+        // Re-use render logic manually to avoid clearing history
+        wordHistory = [];
+        const el = document.createElement('div');
+        el.className = 'word-row';
+        el.textContent = currentContent.text;
+        display.appendChild(el);
+    } else if (currentContent.type === 'double') {
+        wordHistory = [];
+        const el1 = document.createElement('div');
+        el1.className = 'word-row';
+        el1.textContent = currentContent.text1;
+
+        const el2 = document.createElement('div');
+        el2.className = 'word-row';
+        el2.style.animationDelay = '0.1s';
+        el2.textContent = currentContent.text2;
+
+        display.appendChild(el1);
+        display.appendChild(el2);
+    } else if (currentContent.type === 'stream') {
+        wordHistory = currentContent.history;
+        renderHistory();
+    }
+}
 
 // Flagging System
 let currentContent = null; // Store current generated content
